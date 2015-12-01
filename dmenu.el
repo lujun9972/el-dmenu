@@ -5,7 +5,6 @@
 ;; Author: DarkSun <lujun9972@gmail.com>
 ;; Created: 2015-12-01
 ;; Version: 0.1
-;; Package-Requires: ((emacs "24"))
 ;; Keywords: convenience, usability
 
 ;; This file is NOT part of GNU Emacs.
@@ -27,6 +26,8 @@
 ;;
 ;; dmenu's code can be found here:
 ;;   http://github.com/lujun9972/el-dmenu
+
+;;; Commentary:
 
 ;;; Commentary:
 
