@@ -5,7 +5,6 @@
 ;; Author: DarkSun <lujun9972@gmail.com>
 ;; Created: 2015-12-01
 ;; Version: 0.1
-;; URL: http://github.com/lujun9972/el-dmenu/
 ;; Package-Requires: ((emacs "24"))
 ;; Keywords: convenience, usability
 
