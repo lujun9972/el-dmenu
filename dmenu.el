@@ -17,20 +17,17 @@
 ;;; Commentary:
 
 ;; Quick start:
-;; run (dmenu-initialize)
-;;
+
 ;; Bind the following commands:
 ;; dmenu
 ;;
-;; For a detailed introduction see:
-;; http://github.com/lujun9972/el-dmenu/blob/master/README.org
 
 ;;; Code:
 
 (require 'ido)
 (require 'cl)
 (defgroup dmenu nil
-  "M-x interface with Ido-style fuzzy matching and ranking heuristics."
+  "Use ido to simulate the dmenu command line program."
   :group 'extensions
   :group 'convenience
   :link '(emacs-library-link :tag "Lisp File" "dmenu.el"))
@@ -72,7 +69,7 @@ Set this to nil to disable fuzzy matching."
   (unless dmenu--cache-executable-files
 	(dmenu--cache-executable-files))
   (let* ((ido-enable-flex-matching dmenu-flex-matching)
-		 (execute-file (ido-completing-read+ dmenu-prompt-string
+		 (execute-file (ido-completing-read dmenu-prompt-string
 											 (append dmenu--history-list
 													 (remove-if (lambda (x)
 																  (member x dmenu--history-list))
@@ -92,9 +89,7 @@ Set this to nil to disable fuzzy matching."
 	  (setcdr (nthcdr (- dmenu-history-size 1) dmenu--history-list) nil))
 	(switch-to-buffer (apply #'make-comint execute-file execute-file nil args))))
 
-;;;###autoload
 (defun dmenu-initialize ()
-  (interactive)
   (unless ido-mode (dmenu-initialize-ido))
   (dmenu-load-save-file)
   (dmenu-auto-update)
