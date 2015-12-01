@@ -1,18 +1,33 @@
 ;;; dmenu.el --- use ido to simulate the dmenu command line program
 
-;; Copyright (C) 2009-2014 Cornelius Mika and contributors
-;;
-;; Author: Cornelius Mika <cornelius.mika@gmail.com> and contributors
+;; Copyright (C) 2004-2015 Free Software Foundation, Inc.
+
+;; Author: DarkSun <lujun9972@gmail.com>
+;; Created: 2015-12-01
+;; Version: 0.1
 ;; URL: http://github.com/lujun9972/el-dmenu/
 ;; Package-Requires: ((emacs "24"))
-;; Version: 0.1
 ;; Keywords: convenience, usability
 
-;; This file is not part of GNU Emacs.
+;; This file is NOT part of GNU Emacs.
 
-;;; License:
+;; This program is free software; you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
 
-;; Licensed under the same terms as Emacs.
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+;;; Source code
+;;
+;; dmenu's code can be found here:
+;;   http://github.com/lujun9972/el-dmenu
 
 ;;; Commentary:
 
