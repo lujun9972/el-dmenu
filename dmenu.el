@@ -40,7 +40,7 @@
 ;;; Code:
 
 (require 'ido)
-(require 'cl)
+(require 'cl-lib)
 (defgroup dmenu nil
   "Use ido to simulate the dmenu command line program."
   :group 'extensions
@@ -86,7 +86,7 @@ Set this to nil to disable fuzzy matching."
   (let* ((ido-enable-flex-matching dmenu-flex-matching)
 		 (execute-file (ido-completing-read dmenu-prompt-string
 											 (append dmenu--history-list
-													 (remove-if (lambda (x)
+													 (cl-remove-if (lambda (x)
 																  (member x dmenu--history-list))
 																dmenu--cache-executable-files))
 											 nil
@@ -139,10 +139,10 @@ Set this to nil to disable fuzzy matching."
 
 (defun dmenu--cache-executable-files()
   "cache executable files"
-  (let* ((valid-exec-path (remove-if-not #'file-exists-p (remove-if-not #'stringp exec-path)))
+  (let* ((valid-exec-path (cl-remove-if-not #'file-exists-p (cl-remove-if-not #'stringp exec-path)))
 		 (files (mapcan (lambda (dir)
 						  (directory-files dir t nil nil)) valid-exec-path))
-		 (executable-files (mapcar #'file-name-nondirectory (remove-if #'file-directory-p (remove-if-not #'file-executable-p files)))))
+		 (executable-files (mapcar #'file-name-nondirectory (cl-remove-if #'file-directory-p (cl-remove-if-not #'file-executable-p files)))))
 	(setq dmenu--cache-executable-files (sort executable-files #'string<))))
 
 (defvar dmenu--update-timer nil)
