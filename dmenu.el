@@ -113,7 +113,6 @@ Set this to nil to disable fuzzy matching."
 
 (defun dmenu-initialize-ido ()
   "Sets up a minimal Ido environment for `ido-completing-read'."
-  (ido-init-completion-maps)
   (add-hook 'minibuffer-setup-hook 'ido-minibuffer-setup))
 
 
