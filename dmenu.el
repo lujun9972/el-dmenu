@@ -42,7 +42,6 @@
 
 (require 'ido)
 (require 'cl-lib)
-(require 'shell)
 (require 'comint)
 (defgroup dmenu nil
   "Use ido to simulate the dmenu command line program."
@@ -98,10 +97,7 @@ Set this to nil to disable fuzzy matching."
                                             'dmenu--history-list))
 		 args)
 	(when (= prefix 4)
-	  (setq args (read-string "please input the parameters: "))
-	  (with-temp-buffer
-	  	(insert args)
-	  	(setq args (car (shell--parse-pcomplete-arguments)))))
+	  (setq args (split-string-and-unquote (read-string "please input the parameters: "))))
 	(setq dmenu--history-list (cons execute-file (remove execute-file dmenu--history-list)))
 	(when (> (length dmenu--history-list) dmenu-history-size)
 	  (setcdr (nthcdr (- dmenu-history-size 1) dmenu--history-list) nil))
