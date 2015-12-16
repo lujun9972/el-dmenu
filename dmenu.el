@@ -88,14 +88,14 @@ Set this to nil to disable fuzzy matching."
 	(dmenu--cache-executable-files))
   (let* ((ido-enable-flex-matching dmenu-flex-matching)
 		 (execute-file (ido-completing-read dmenu-prompt-string
-											 (append dmenu--history-list
-													 (cl-remove-if (lambda (x)
-																  (member x dmenu--history-list))
-																dmenu--cache-executable-files))
-											 nil
-											 'confirm
-											 nil
-											 'dmenu--history-list))
+                                            (append dmenu--history-list
+                                                    (cl-remove-if (lambda (x)
+                                                                    (member x dmenu--history-list))
+                                                                  dmenu--cache-executable-files))
+                                            nil
+                                            'confirm
+                                            nil
+                                            'dmenu--history-list))
 		 args)
 	(when (= prefix 4)
 	  (setq args (read-string "please input the parameters: "))
@@ -105,7 +105,11 @@ Set this to nil to disable fuzzy matching."
 	(setq dmenu--history-list (cons execute-file (remove execute-file dmenu--history-list)))
 	(when (> (length dmenu--history-list) dmenu-history-size)
 	  (setcdr (nthcdr (- dmenu-history-size 1) dmenu--history-list) nil))
-	(switch-to-buffer (apply #'make-comint execute-file execute-file nil args))))
+	(switch-to-buffer (apply #'make-comint execute-file execute-file nil args))
+    (set-process-sentinel (get-buffer-process (current-buffer))
+                          (lambda (process event)
+                            (princ (format "Process: %s had the event `%s'" process event))
+                            (kill-buffer (process-buffer process))))))
 
 (defun dmenu-initialize ()
   (unless ido-mode (dmenu-initialize-ido))
