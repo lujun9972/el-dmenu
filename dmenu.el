@@ -42,6 +42,8 @@
 
 (require 'ido)
 (require 'cl-lib)
+(require 'shell)
+(require 'comint)
 (defgroup dmenu nil
   "Use ido to simulate the dmenu command line program."
   :group 'extensions
