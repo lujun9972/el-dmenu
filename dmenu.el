@@ -104,8 +104,8 @@ Set this to nil to disable fuzzy matching."
 	(switch-to-buffer (apply #'make-comint execute-file execute-file nil args))
     (set-process-sentinel (get-buffer-process (current-buffer))
                           (lambda (process event)
-                            (princ (format "Process: %s had the event `%s'" process event))
-                            (kill-buffer (process-buffer process))))))
+                            (when (eq 'exit (process-status process))
+                              (kill-buffer (process-buffer process)))))))
 
 (defun dmenu-initialize ()
   (unless ido-mode (dmenu-initialize-ido))
