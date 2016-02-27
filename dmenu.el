@@ -1,4 +1,4 @@
-;;; dmenu.el --- use ido to simulate the dmenu command line program
+;;; dmenu.el --- simulate the dmenu command line program
 
 ;; Copyright (C) 2004-2015 Free Software Foundation, Inc.
 
@@ -40,11 +40,10 @@
 
 ;;; Code:
 
-(require 'ido)
 (require 'cl-lib)
 (require 'comint)
 (defgroup dmenu nil
-  "Use ido to simulate the dmenu command line program."
+  "simulate the dmenu command line program."
   :group 'extensions
   :group 'convenience
   :link '(emacs-library-link :tag "Lisp File" "dmenu.el"))
@@ -59,12 +58,6 @@ Must be set before initializing Dmenu."
 (defcustom dmenu-prompt-string ": "
   "String to display in the dmenu prompt."
   :type 'string
-  :group 'dmenu)
-
-(defcustom dmenu-flex-matching t
-  "Enables Ido flex matching. On by default.
-Set this to nil to disable fuzzy matching."
-  :type 'boolean
   :group 'dmenu)
 
 (defcustom dmenu-history-size 7
@@ -85,39 +78,32 @@ Set this to nil to disable fuzzy matching."
 	(dmenu-initialize))
   (unless dmenu--cache-executable-files
 	(dmenu--cache-executable-files))
-  (let* ((ido-enable-flex-matching dmenu-flex-matching)
-		 (execute-file (ido-completing-read dmenu-prompt-string
-                                            (append dmenu--history-list
-                                                    (cl-remove-if (lambda (x)
-                                                                    (member x dmenu--history-list))
-                                                                  dmenu--cache-executable-files))
-                                            nil
-                                            'confirm
-                                            nil
-                                            'dmenu--history-list))
-		 args)
-	(when (= prefix 4)
-	  (setq args (split-string-and-unquote (read-string "please input the parameters: "))))
-	(setq dmenu--history-list (cons execute-file (remove execute-file dmenu--history-list)))
-	(when (> (length dmenu--history-list) dmenu-history-size)
-	  (setcdr (nthcdr (- dmenu-history-size 1) dmenu--history-list) nil))
-	(switch-to-buffer (apply #'make-comint execute-file execute-file nil args))
+  (let* ((execute-file (completing-read dmenu-prompt-string
+                                        (append dmenu--history-list
+                                                (cl-remove-if (lambda (x)
+                                                                (member x dmenu--history-list))
+                                                              dmenu--cache-executable-files))
+                                        nil
+                                        'confirm
+                                        nil
+                                        'dmenu--history-list))
+         args)
+    (when (= prefix 4)
+      (setq args (split-string-and-unquote (read-string "please input the parameters: "))))
+    (setq dmenu--history-list (cons execute-file (remove execute-file dmenu--history-list)))
+    (when (> (length dmenu--history-list) dmenu-history-size)
+      (setcdr (nthcdr (- dmenu-history-size 1) dmenu--history-list) nil))
+    (switch-to-buffer (apply #'make-comint execute-file execute-file nil args))
     (set-process-sentinel (get-buffer-process (current-buffer))
                           (lambda (process event)
                             (when (eq 'exit (process-status process))
                               (kill-buffer (process-buffer process)))))))
 
 (defun dmenu-initialize ()
-  (unless ido-mode (dmenu-initialize-ido))
   (dmenu-load-save-file)
   (dmenu-auto-update)
   (add-hook 'kill-emacs-hook 'dmenu-save-to-file)
   (setq dmenu-initialized-p t))
-
-(defun dmenu-initialize-ido ()
-  "Sets up a minimal Ido environment for `ido-completing-read'."
-  (add-hook 'minibuffer-setup-hook 'ido-minibuffer-setup))
-
 
 (defun dmenu-load-save-file ()
   "Loads `dmenu--history-list' and `dmenu--cache-executable-files' from `dmenu-save-file'"
@@ -125,36 +111,36 @@ Set this to nil to disable fuzzy matching."
     (if (file-readable-p save-file)
         (with-temp-buffer
           (insert-file-contents save-file)
-		  (ignore-errors
-			(setq dmenu--cache-executable-files (read (current-buffer)))
-			(setq dmenu--history-list (read (current-buffer)))))
+          (ignore-errors
+            (setq dmenu--cache-executable-files (read (current-buffer)))
+            (setq dmenu--history-list (read (current-buffer)))))
       (setq dmenu--history-list nil
-			dmenu--cache-executable-files nil))))
+            dmenu--cache-executable-files nil))))
 
 (defun dmenu-save-to-file ()
   "Saves `dmenu--history-list' and `dmenu--cache-executable-files' to `dmenu-save-file'"
   (interactive)
   (with-temp-file (expand-file-name dmenu-save-file)
-    (ido-pp 'dmenu--cache-executable-files)
-	(ido-pp 'dmenu--history-list)))
+    (prin1 dmenu--cache-executable-files (current-buffer))
+    (prin1 dmenu--history-list (current-buffer))))
 
 
 (defun dmenu--cache-executable-files()
   "cache executable files"
   (let* ((valid-exec-path (cl-remove-if-not #'file-exists-p (cl-remove-if-not #'stringp exec-path)))
-		 (files (cl-mapcan (lambda (dir)
-						  (directory-files dir t nil nil)) valid-exec-path))
-		 (executable-files (mapcar #'file-name-nondirectory (cl-remove-if #'file-directory-p (cl-remove-if-not #'file-executable-p files)))))
-	(setq dmenu--cache-executable-files (sort executable-files #'string<))))
+         (files (cl-mapcan (lambda (dir)
+                             (directory-files dir t nil nil)) valid-exec-path))
+         (executable-files (mapcar #'file-name-nondirectory (cl-remove-if #'file-directory-p (cl-remove-if-not #'file-executable-p files)))))
+    (setq dmenu--cache-executable-files (sort executable-files #'string<))))
 
 (defvar dmenu--update-timer nil)
 
 (defun dmenu-auto-update (&optional idle-time)
   "Update dmenu when Emacs has been idle for IDLE-TIME."
   (let ((idle-time (or idle-time 60)))
-	(when dmenu--update-timer
-	  (cancel-timer dmenu--update-timer))
-	(setq dmenu--update-timer (run-with-idle-timer idle-time t #'dmenu--cache-executable-files))))
+    (when dmenu--update-timer
+      (cancel-timer dmenu--update-timer))
+    (setq dmenu--update-timer (run-with-idle-timer idle-time t #'dmenu--cache-executable-files))))
 
 (provide 'dmenu)
 
