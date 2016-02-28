@@ -78,7 +78,10 @@ Must be set before initializing Dmenu."
 	(dmenu-initialize))
   (unless dmenu--cache-executable-files
 	(dmenu--cache-executable-files))
-  (let* ((execute-file (completing-read dmenu-prompt-string
+  (let* ((completing-read-fn (if ido-mode
+                                 #'ido-completing-read
+                               #'completing-read))
+         (execute-file (funcall completing-read-fn dmenu-prompt-string
                                         (append dmenu--history-list
                                                 (cl-remove-if (lambda (x)
                                                                 (member x dmenu--history-list))
@@ -87,9 +90,8 @@ Must be set before initializing Dmenu."
                                         'confirm
                                         nil
                                         'dmenu--history-list))
-         args)
-    (when (= prefix 4)
-      (setq args (split-string-and-unquote (read-string "please input the parameters: "))))
+         (args (when (= prefix 4)
+                 (split-string-and-unquote (read-string "please input the parameters: ")))))
     (setq dmenu--history-list (cons execute-file (remove execute-file dmenu--history-list)))
     (when (> (length dmenu--history-list) dmenu-history-size)
       (setcdr (nthcdr (- dmenu-history-size 1) dmenu--history-list) nil))
