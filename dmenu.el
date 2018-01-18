@@ -129,7 +129,7 @@ Must be set before initializing Dmenu."
 
 (defun dmenu--cache-executable-files()
   "cache executable files"
-  (let* ((valid-exec-path (cl-remove-if-not #'file-exists-p (cl-remove-if-not #'stringp exec-path)))
+  (let* ((valid-exec-path (seq-uniq (cl-remove-if-not #'file-exists-p (cl-remove-if-not #'stringp exec-path))))
          (files (cl-mapcan (lambda (dir)
                              (directory-files dir t nil nil)) valid-exec-path))
          (executable-files (mapcar #'file-name-nondirectory (cl-remove-if #'file-directory-p (cl-remove-if-not #'file-executable-p files)))))
