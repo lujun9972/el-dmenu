@@ -97,7 +97,12 @@ Must be set before initializing Dmenu."
            (setq dmenu--history-list nil))
           ((> (length dmenu--history-list) dmenu-history-size)
            (setcdr (nthcdr (- dmenu-history-size 1) dmenu--history-list) nil)))
-    (switch-to-buffer (apply #'make-comint execute-file execute-file nil args))
+    (switch-to-buffer
+      (let* ((cmdlist (split-string-and-unquote execute-file))
+             (name execute-file)
+             (program (car cmdlist))
+             (switches (append (cdr cmdlist) args)))
+        (apply #'make-comint name program nil switches)))
     (set-process-sentinel (get-buffer-process (current-buffer))
                           (lambda (process event)
                             (when (eq 'exit (process-status process))
