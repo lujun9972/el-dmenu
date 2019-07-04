@@ -100,9 +100,10 @@ Must be set before initializing Dmenu."
     (switch-to-buffer
       (let* ((cmdlist (split-string-and-unquote execute-file))
              (name execute-file)
+             (buffer (generate-new-buffer (concat "*" name "*")))
              (program (car cmdlist))
              (switches (append (cdr cmdlist) args)))
-        (apply #'make-comint name program nil switches)))
+        (apply #'make-comint-in-buffer name buffer program nil switches)))
     (set-process-sentinel (get-buffer-process (current-buffer))
                           (lambda (process event)
                             (when (eq 'exit (process-status process))
