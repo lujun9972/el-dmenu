@@ -100,10 +100,14 @@ Must be set before initializing Dmenu."
     (switch-to-buffer
       (let* ((cmdlist (split-string-and-unquote execute-file))
              (name execute-file)
-             (buffer (generate-new-buffer (concat "*" name "*")))
+             (buffer (generate-new-buffer-name (concat "*" name "*")))
              (program (car cmdlist))
-             (switches (append (cdr cmdlist) args)))
-        (apply #'make-comint-in-buffer name buffer program nil switches)))
+             (switches (append (cdr cmdlist) args))
+             (default-directory (if (or (null default-directory)
+                                        (file-remote-p default-directory))
+                                    "/"
+                                  default-directory)))
+        (apply #'make-comint-in-buffer name buffer program nil switches))) ;the `default-directory' of `buffer` should not be a remote directory or it will try to execute application in the remote host though TRAMP.
     (set-process-sentinel (get-buffer-process (current-buffer))
                           (lambda (process event)
                             (when (eq 'exit (process-status process))
