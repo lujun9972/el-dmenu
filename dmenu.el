@@ -140,12 +140,17 @@ Must be set before initializing Dmenu."
 
 
 (defun dmenu--cache-executable-files()
-  "cache executable files"
-  (let* ((valid-exec-path (seq-uniq (cl-remove-if-not #'file-exists-p (cl-remove-if-not #'stringp exec-path))))
-         (files (cl-mapcan (lambda (dir)
-                             (directory-files dir t nil nil)) valid-exec-path))
-         (executable-files (mapcar #'file-name-nondirectory (cl-remove-if #'file-directory-p (cl-remove-if-not #'file-executable-p files)))))
-    (setq dmenu--cache-executable-files (sort executable-files #'string<))))
+  "Scan $PATH (i.e., `exec-path') for names of executable files and cache them into memory (in variable `dmenu--cache-executable-files')."
+  (let* ((valid-exec-path (seq-uniq
+                           (cl-remove-if-not #'file-exists-p
+                                             (cl-remove-if-not #'stringp exec-path))))
+         (files (cl-mapcan (lambda (dir) (directory-files dir t nil nil))
+                           valid-exec-path))
+         (executable-files (mapcar #'file-name-nondirectory
+                                   (cl-remove-if #'file-directory-p
+                                                 (cl-remove-if-not #'file-executable-p
+                                                                   files)))))
+    (setq dmenu--cache-executable-files (seq-uniq (sort executable-files #'string<)))))
 
 (defvar dmenu--update-timer nil)
 
