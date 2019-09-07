@@ -81,22 +81,17 @@ Must be set before initializing Dmenu."
   (let* ((completing-read-fn (if ido-mode
                                  #'ido-completing-read
                                #'completing-read))
-         (execute-file (funcall completing-read-fn
-                                dmenu-prompt-string
-                                (append dmenu--history-list
-                                        dmenu--cache-executable-files)
-                                nil
-                                'confirm
-                                nil))
+         (execute-file (funcall completing-read-fn dmenu-prompt-string
+                                        (append dmenu--history-list
+                                                (cl-remove-if (lambda (x)
+                                                                (member x dmenu--history-list))
+                                                              dmenu--cache-executable-files))
+                                        nil
+                                        'confirm
+                                        nil))
          (args (when (= prefix 4)
                  (split-string-and-unquote (read-string "please input the parameters: ")))))
-    ;; Add history entries when the user input was a PATH command followed by
-    ;; one or more arguments.
-    (if (let ((cmd+args (split-string execute-file)))
-          (and (> (length cmd+args) 1)
-               (member (car cmd+args) dmenu--cache-executable-files)))
-        (push execute-file dmenu--history-list))
-    ;; Now, limit the size/length of history to `dmenu-history-size' entries.
+    (pushnew execute-file dmenu--history-list :test #'string-equal)
     (cond ((< dmenu-history-size 1)
            (setq dmenu--history-list nil))
           ((> (length dmenu--history-list) dmenu-history-size)
