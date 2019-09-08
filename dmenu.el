@@ -91,7 +91,7 @@ Must be set before initializing Dmenu."
                                         nil))
          (args (when (= prefix 4)
                  (split-string-and-unquote (read-string "please input the parameters: ")))))
-    (pushnew execute-file dmenu--history-list :test #'string-equal)
+    (setq dmenu--history-list (cons execute-file (remove execute-file dmenu--history-list)))
     (cond ((< dmenu-history-size 1)
            (setq dmenu--history-list nil))
           ((> (length dmenu--history-list) dmenu-history-size)
